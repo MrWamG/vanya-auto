@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Vanya Online 喜欢我狩猎时随身携带一个酒馆在身上吗
 // @namespace    http://tampermonkey.net/
-// @version      0.0.8
+// @version      0.0.10
 // @description  网页游戏 Vanya Online (https://vanyaonline.com/) 的自动化脚本
 // @author       王铁牛(QQ: 2459120212)
 // @icon         https://vanyaonline.com/favicon.ico
@@ -124,10 +124,11 @@ const catchLife = async () => {
                 });
 
                 const data = await response.json();
-                console.log({ data });
-
                 // 如果购买生命值没成功则终止狩猎
-                if (data.status === "error") {
+                if (
+                    (data.status === "error")
+                    && data.message.includes("Insufficient Gold")
+                ) {
                     await huntStop();
                     // 直接跳转至酒馆界面
                     window.location = "https://vanyaonline.com/pub";
@@ -213,45 +214,39 @@ const trainingClick = async () => {
     // 注意：dummy_id=NaN 是字符串 "NaN"，不是 JavaScript 的 NaN
     const body = 'dummy_id=NaN&skill=defense&start=0&is_lite=0';
 
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: headers,
-            body: body,
-            credentials: 'include',
-            mode: 'cors',
-            cache: 'no-cache',
-            redirect: 'follow'
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        // 如果主动训练失败，极有可能是目前正处于离线训练，将离线训练终止
-        if(data.status === "error"){
-            await stopOfflineTraining();
-        }
-        console.log('训练角色响应:', data);
-        return data;
-
-    } catch (error) {
-        console.error('训练角色失败:', error);
-        throw error;
-    }
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: headers,
+        body: body,
+        credentials: 'include',
+        mode: 'cors',
+        cache: 'no-cache',
+        redirect: 'follow'
+    });
+    
+    return response;
 }
 
-// 每一点五秒执行
-setInterval(async () => {
+// 循环点击训练
+const trainingLoop = async () => {
     await trainingClick();
-}, 1000 * 1.5)
+    setTimeout(() => {
+        trainingLoop();
+    },1000 * 1)
+}
 
-// 每三秒检测一次
-setInterval(async () => {
+trainingLoop();
+
+// 循环狩猎
+const huntLoop = async () => {
     await isTimeEnd();
     await catchLife();
-}, 1000 * 3)
+    setTimeout(() => {
+        huntLoop();
+    }, 1000 *3)
+}
+
+huntLoop();
 
 // 游戏在刷怪界面是每过 1 分钟刷新一次页面以更新数据，为了避免发生意外情况（如果游戏维护）导致游戏不刷新内容，故我方每 1分10秒 刷新一次页面
 setInterval(async () => {
