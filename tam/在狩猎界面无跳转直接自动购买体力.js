@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Vanya Online 喜欢我狩猎时随身携带一个酒馆在身上吗
 // @namespace    http://tampermonkey.net/
-// @version      0.0.10
+// @version      0.0.11
 // @description  网页游戏 Vanya Online (https://vanyaonline.com/) 的自动化脚本
 // @author       王铁牛(QQ: 2459120212)
 // @icon         https://vanyaonline.com/favicon.ico
@@ -141,101 +141,6 @@ const catchLife = async () => {
         }
     }
 };
-
-// 停止离线训练（如果买血的金币不够会自动开始酒馆的防御自动点击训练，但点击训练与离线训练冲突，因此需要将离线训练终止）
-const stopOfflineTraining = async () => {
-    const url = 'https://vanyaonline.com/process/pub_offline_train.php';
-
-    // 设置请求头
-    const headers = {
-        'accept': '*/*',
-        'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8,ja;q=0.7,zh-TW;q=0.6',
-        'content-type': 'application/x-www-form-urlencoded',
-        'origin': 'https://vanyaonline.com',
-        'priority': 'u=1, i',
-        'referer': 'https://vanyaonline.com/pub',
-        'sec-ch-ua': '"Google Chrome";v="143", "Chromium";v="143", "Not A(Brand";v="24"',
-        'sec-ch-ua-mobile': '?0',
-        'sec-ch-ua-platform': '"Windows"',
-        'sec-fetch-dest': 'empty',
-        'sec-fetch-mode': 'cors',
-        'sec-fetch-site': 'same-origin',
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36',
-    };
-
-    // 设置请求体
-    const body = 'action=stop';
-
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: headers,
-            body: body,
-            credentials: 'include',  // 包含 cookies
-            mode: 'cors',
-            cache: 'no-cache'
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log('停止离线训练响应:', data);
-        return data;
-
-    } catch (error) {
-        console.error('停止离线训练失败:', error);
-        throw error;
-    }
-}
-
-// 开始训练
-const trainingClick = async () => {
-    const url = 'https://vanyaonline.com/process/pub_train_click.php';
-
-    // 设置请求头
-    const headers = {
-        'accept': '*/*',
-        'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8,ja;q=0.7,zh-TW;q=0.6',
-        'content-type': 'application/x-www-form-urlencoded',
-        'origin': 'https://vanyaonline.com',
-        'priority': 'u=1, i',
-        'referer': 'https://vanyaonline.com/pub',
-        'sec-ch-ua': '"Google Chrome";v="143", "Chromium";v="143", "Not A(Brand";v="24"',
-        'sec-ch-ua-mobile': '?0',
-        'sec-ch-ua-platform': '"Windows"',
-        'sec-fetch-dest': 'empty',
-        'sec-fetch-mode': 'cors',
-        'sec-fetch-site': 'same-origin',
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36',
-    };
-
-    // 注意：dummy_id=NaN 是字符串 "NaN"，不是 JavaScript 的 NaN
-    const body = 'dummy_id=NaN&skill=defense&start=0&is_lite=0';
-
-    const response = await fetch(url, {
-        method: 'POST',
-        headers: headers,
-        body: body,
-        credentials: 'include',
-        mode: 'cors',
-        cache: 'no-cache',
-        redirect: 'follow'
-    });
-    
-    return response;
-}
-
-// 循环点击训练
-const trainingLoop = async () => {
-    await trainingClick();
-    setTimeout(() => {
-        trainingLoop();
-    },1000 * 1)
-}
-
-trainingLoop();
 
 // 循环狩猎
 const huntLoop = async () => {
