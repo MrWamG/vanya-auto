@@ -211,7 +211,6 @@ const trainingClick = async () => {
         'sec-fetch-mode': 'cors',
         'sec-fetch-site': 'same-origin',
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36',
-        'x-csrf-token': '054457a2f3d9fd89d51b589f1e913685b28820195eee7a27b3c06cbb19f12550'
     };
 
     // 注意：dummy_id=NaN 是字符串 "NaN"，不是 JavaScript 的 NaN
