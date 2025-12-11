@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Vanya Online 自动花费金币购买体力
+// @name         Vanya Online 喜欢我狩猎时随身携带一个酒馆在身上吗
 // @namespace    http://tampermonkey.net/
 // @version      0.0.8
 // @description  网页游戏 Vanya Online (https://vanyaonline.com/) 的自动化脚本
@@ -83,7 +83,7 @@ const isTimeEnd = async () => {
 
 // 抓取 https://vanyaonline.com/actions/hunt 中剩余的生命值
 const catchLife = async () => {
-    const limit = 950; // 低于该值则购买一次体力
+    const limit = 300; // 低于该值则购买一次体力
     let life = "9999";
     if (window.location.pathname === "/actions/hunt") {
         life = document.getElementById("lifeSpan").innerHTML
@@ -191,9 +191,6 @@ const stopOfflineTraining = async () => {
 
 // 开始训练
 const trainingClick = async () => {
-    if (window.location.pathname !== "/pub") {
-        return false;
-    };
     const url = 'https://vanyaonline.com/process/pub_train_click.php';
 
     // 设置请求头
